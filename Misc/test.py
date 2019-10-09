@@ -1,4 +1,5 @@
 import random
+from random import randrange
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
@@ -10,8 +11,11 @@ import math
 N_POPULATION = 500
 N_DIMENSION = 3
 N_POLAR = int(math.log(math.sqrt(N_POPULATION)) + 1)
+N_SAMPLE = 256
 MAX_RANGE = 10000
 MIN_RANGE = 0
+BALANCE_THRESHOLD = 0.1
+OUTLIER_THRESHOLD = 0.05
 random.seed(12345)
 
 
@@ -21,6 +25,28 @@ def random_point(dimension=N_DIMENSION, min_c=MIN_RANGE, max_c=MAX_RANGE):
 
 def sqd(p1, p2):
     return int(math.sqrt(sum((c1 - c2) ** 2 for c1, c2 in zip(p1, p2))))
+
+
+def select(data, size):
+    res = []
+    for _ in range(size):
+        if data:
+            pos = randrange(len(data))
+            elem = data[pos]
+            data[pos] = data[-1]
+            del data[-1]
+            res.append(elem)
+    if res:
+        return res
+    else:
+        return None
+
+
+def balanceValue(left, right):
+    if right != 0:
+        return math.abs(1 - left / right)
+    else:
+        return 10 ** 32  # just return a large value
 
 
 def projection(p=[], polar=[]):
@@ -56,10 +82,11 @@ def main():
     ax.set_zlabel('Z Label')
     # plt.show()
 
+    # ----------most distance----------
     # generate N_POLAR**N_POLAR polars
-    # however, we want to avoid short polars
+    # however, we want to avoid short distance polars
     polar = {}
-    print(N_POLAR ** N_POLAR)
+    # print(N_POLAR ** N_POLAR)
 
     for i in range(N_POLAR ** N_POLAR):  # how to sample
         randomP1 = random.choice(pop)
@@ -77,8 +104,10 @@ def main():
     # only keep top N_POLAR polars
     finalPolarList = [sortedPolar[i] for i in range(N_POLAR)]
     finalPolar = dict(finalPolarList)  # convert list to dict
-    print(finalPolar)
+    # print(finalPolar)
 
+    print("")
+    print("Top N_POlAR polars from all random selection")
     for key1, value1 in finalPolar.items():
         print(value1)
         p1 = value1.get("P1")
@@ -94,64 +123,96 @@ def main():
     ds = [sqd(i, east) for i in pop]
     west = pop[ds.index(max(ds))]
 
+    print("")
+    print("The longest distance in the space:")
     print("east: ", east, "west:", west, "Distance: ", sqd(east, west))
     plt.plot(east, west, 'k^-')
     plt.show()
 
+    # ----------most divide----------
+    # to remove outlier points with a percentage
+
+    # pick random samples from pop
+    # and project to polars
+    randomSample = select(pop.copy(), N_SAMPLE)
+    # print("random samples from pop: ", randomSample)
+
+    # print(finalPolar)
+
+    projection = {}
+    for i in range(len(randomSample)):
+        projection[i] = {}
+        countPolar = 0
+        for key, value in finalPolar.items():
+            leftDistance = sqd(randomSample[i], value.get("P1"))
+            rightDiatance = sqd(randomSample[i], value.get("P2"))
+            currentPolar = "Polar" + str(countPolar)
+            if leftDistance <= rightDiatance:
+                projection[i][currentPolar] = [0, 1]
+            else:
+                projection[i][currentPolar] = [1, 0]
+            countPolar += 1
+    print("")
+    print("Project all samples to existing polars:")
+    print(projection)
+
+
+
+
     exit(1)
 
-    polar = []
-
-    x = [c[0] for c in pop]
-    y = [c[1] for c in pop]
-    pop = sorted(pop, key=lambda l: l[1], reverse=True)
-    randomP = pop[500]
-    # print(randomP)
-
-    # find the longest polar
-    ds = [sqd(i, randomP) for i in pop]
-    east = pop[ds.index(max(ds))]
-    ds = [sqd(i, east) for i in pop]
-    west = pop[ds.index(max(ds))]
-
-    if east[0] < west[0]:
-        polar.append(east + west)
-    else:
-        polar.append(west + east)
-
-    # generate another 4 polars
-    for _ in range(4):
-        p1, p2 = random.sample(pop, 2)
-        if p1[0] < p2[0]:
-            polar.append(p1 + p2)
-        else:
-            polar.append(p2 + p1)
-    print("All polars:", polar)
-
-    plt.scatter(x, y, label="point", color="green", marker=".", s=30)
-    plt.xlabel('x - axis')
-    plt.ylabel('y - axis')
-    plt.title('Plot random points and polars')
-    for i in range(len(polar)):
-        # print(polar[i])
-        p1 = [polar[i][0], polar[i][1]]
-        p2 = [polar[i][2], polar[i][3]]
-        plt.plot(p1, p2, 'ro-')
-    # plt.plot(east, west, 'ro-')
-    plt.legend()
-    plt.show()
-
-    # label = {}
-    label = []
-    for i, x in enumerate(pop):
-        cell = []
-        for j, p in enumerate(polar):
-            # print(x, p, projection(x, p))
-            cell.append(projection(x, p))
-            # label[i, j] = projection(x, p)
-        label.append(cell)
-
-    print(label)
+    # polar = []
+    #
+    # x = [c[0] for c in pop]
+    # y = [c[1] for c in pop]
+    # pop = sorted(pop, key=lambda l: l[1], reverse=True)
+    # randomP = pop[500]
+    # # print(randomP)
+    #
+    # # find the longest polar
+    # ds = [sqd(i, randomP) for i in pop]
+    # east = pop[ds.index(max(ds))]
+    # ds = [sqd(i, east) for i in pop]
+    # west = pop[ds.index(max(ds))]
+    #
+    # if east[0] < west[0]:
+    #     polar.append(east + west)
+    # else:
+    #     polar.append(west + east)
+    #
+    # # generate another 4 polars
+    # for _ in range(4):
+    #     p1, p2 = random.sample(pop, 2)
+    #     if p1[0] < p2[0]:
+    #         polar.append(p1 + p2)
+    #     else:
+    #         polar.append(p2 + p1)
+    # print("All polars:", polar)
+    #
+    # plt.scatter(x, y, label="point", color="green", marker=".", s=30)
+    # plt.xlabel('x - axis')
+    # plt.ylabel('y - axis')
+    # plt.title('Plot random points and polars')
+    # for i in range(len(polar)):
+    #     # print(polar[i])
+    #     p1 = [polar[i][0], polar[i][1]]
+    #     p2 = [polar[i][2], polar[i][3]]
+    #     plt.plot(p1, p2, 'ro-')
+    # # plt.plot(east, west, 'ro-')
+    # plt.legend()
+    # plt.show()
+    #
+    # # label = {}
+    # label = []
+    # for i, x in enumerate(pop):
+    #     cell = []
+    #     for j, p in enumerate(polar):
+    #         # print(x, p, projection(x, p))
+    #         cell.append(projection(x, p))
+    #         # label[i, j] = projection(x, p)
+    #     label.append(cell)
+    #
+    # print(label)
 
 
 if __name__ == "__main__":
