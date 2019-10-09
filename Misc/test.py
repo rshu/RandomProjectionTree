@@ -1,11 +1,15 @@
 import random
 import matplotlib.pyplot as plt
 
+N_POINT = 10000
+N_DIMENSION = 2
+
+# an example of two dimension space
 random.seed(30)
 
 
-def random_point(dimension=2, min_c=0, max_c=10000):
-    return [random.randint(min_c, max_c) for _ in range(dimension)]
+def random_point(dimension=2, min_c=0, max_c=N_POINT):
+    return [random.randint(min_c, max_c) for n,_ in enumerate(range(dimension))]
 
 
 def distance(p1=[], p2=[]):
