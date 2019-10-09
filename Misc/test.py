@@ -59,9 +59,12 @@ def balanceValue(left, right):
 #     else:
 #         return 1  # near the right point
 
-
+# split the population recursively
 def RPTree():
     pass
+
+
+# Normalize the input space
 
 
 def main():
@@ -135,8 +138,10 @@ def main():
     # pick random samples from pop
     # and project to polars
     randomSample = select(pop.copy(), N_SAMPLE)
-    # print("random samples from pop: ", randomSample)
-
+    print("random samples from pop: ", randomSample)
+    print("")
+    print("Number of random samples:")
+    print(len(randomSample))
     # print(finalPolar)
 
     projection = {}
@@ -163,13 +168,18 @@ def main():
     print(projection)
 
     # remove sample with balanceValue higher than threshold
-    projectionCopy = {key:value for key, value in projection.copy().items() if value.get("BalanceValue") < BALANCE_THRESHOLD}
+    projectionCopy = {key: value for key, value in projection.copy().items() if
+                      value.get("BalanceValue") < BALANCE_THRESHOLD}
 
+    print("")
     print("Remove sample with high balanceValue:")
     print(projectionCopy)
-    print(len(projectionCopy))
+    print("Number of balanced samples: ", len(projectionCopy))
+
+    # plot the samples out
 
 
+    # use kmeans to cluster points
 
     exit(1)
 
