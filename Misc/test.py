@@ -44,20 +44,20 @@ def select(data, size):
 
 def balanceValue(left, right):
     if right != 0:
-        return math.abs(1 - left / right)
+        return abs(1 - left / right)
     else:
         return 10 ** 32  # just return a large value
 
 
-def projection(p=[], polar=[]):
-    left = [polar[0], polar[1]]
-    right = [polar[2], polar[3]]
-
-    # find point near left or right
-    if sqd(p, left) <= sqd(p, right):
-        return 0  # near the left point
-    else:
-        return 1  # near the right point
+# def projection(p=[], polar=[]):
+#     left = [polar[0], polar[1]]
+#     right = [polar[2], polar[3]]
+#
+#     # find point near left or right
+#     if sqd(p, left) <= sqd(p, right):
+#         return 0  # near the left point
+#     else:
+#         return 1  # near the right point
 
 
 def RPTree():
@@ -142,20 +142,32 @@ def main():
     projection = {}
     for i in range(len(randomSample)):
         projection[i] = {}
+        left = 0
+        right = 0
+
         countPolar = 0
         for key, value in finalPolar.items():
             leftDistance = sqd(randomSample[i], value.get("P1"))
             rightDiatance = sqd(randomSample[i], value.get("P2"))
             currentPolar = "Polar" + str(countPolar)
             if leftDistance <= rightDiatance:
+                left += 1
                 projection[i][currentPolar] = [0, 1]
             else:
+                right += 1
                 projection[i][currentPolar] = [1, 0]
             countPolar += 1
+            projection[i]["BalanceValue"] = balanceValue(left, right)
     print("")
     print("Project all samples to existing polars:")
     print(projection)
 
+    # remove sample with balanceValue higher than threshold
+    projectionCopy = {key:value for key, value in projection.copy().items() if value.get("BalanceValue") < BALANCE_THRESHOLD}
+
+    print("Remove sample with high balanceValue:")
+    print(projectionCopy)
+    print(len(projectionCopy))
 
 
 
