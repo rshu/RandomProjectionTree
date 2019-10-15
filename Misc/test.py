@@ -6,6 +6,7 @@ from mpl_toolkits import mplot3d
 from collections import OrderedDict
 from operator import getitem
 import math
+from sklearn.cluster import KMeans
 
 # parameter initialization
 N_POPULATION = 500
@@ -138,10 +139,10 @@ def main():
     # pick random samples from pop
     # and project to polars
     randomSample = select(pop.copy(), N_SAMPLE)
-    print("random samples from pop: ", randomSample)
-    print("")
-    print("Number of random samples:")
-    print(len(randomSample))
+    # print("random samples from pop: ", randomSample)
+    # print("")
+    # print("Number of random samples:")
+    # print(len(randomSample))
     # print(finalPolar)
 
     projection = {}
@@ -174,12 +175,39 @@ def main():
     print("")
     print("Remove sample with high balanceValue:")
     print(projectionCopy)
+    # print(type(projectionCopy))
     print("Number of balanced samples: ", len(projectionCopy))
 
-    # plot the samples out
+    # plot the samples out # TODO
+
+    # use kmeans to group points into two clusters
+    # one cluster into eastItems, the other cluster into westItems
+    eastItems = {}
+    westItems = {}
+
+    print(randomSample)
+    balancedSamples = []
 
 
-    # use kmeans to cluster points
+    for k, v in projectionCopy.items():
+        # print(k)
+        balancedSamples.append(randomSample[k])
+
+    print("All balanced samples:")
+    print(balancedSamples)
+    # print(len(balancedSamples))
+
+    balancedSampleArray = np.asarray(balancedSamples)
+    kmeans = KMeans(n_clusters=2, random_state=0).fit(balancedSampleArray)
+    print(kmeans.labels_)
+
+    # east label = 0
+    # west label = 1
+
+    # do this recursively # TODO
+
+
+
 
     exit(1)
 
