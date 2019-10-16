@@ -12,13 +12,14 @@ from sklearn.cluster import KMeans
 N_POPULATION = 50000
 N_DIMENSION = 3
 N_POLAR = int(math.log(math.sqrt(N_POPULATION)) + 1)
-N_SAMPLE = 2560
+N_SAMPLE = 256
 MAX_RANGE = 10000
 MIN_RANGE = 0
-BALANCE_THRESHOLD = 0.75
+BALANCE_THRESHOLD = 1.0
 OUTLIER_THRESHOLD = 0.05
 random.seed(12345)
 
+OutputRPTree = {}
 
 def random_point(dimension=N_DIMENSION, min_c=MIN_RANGE, max_c=MAX_RANGE):
     return [random.randint(min_c, max_c) for _, _ in enumerate(range(dimension))]
@@ -44,21 +45,12 @@ def select(data, size):
 
 
 def balanceValue(left, right):
-    if right != 0:
+    if left <= right:
         return abs(1 - left / right)
-    else:
-        return 10 ** 32  # just return a large value
-
-
-# def projection(p=[], polar=[]):
-#     left = [polar[0], polar[1]]
-#     right = [polar[2], polar[3]]
-#
-#     # find point near left or right
-#     if sqd(p, left) <= sqd(p, right):
-#         return 0  # near the left point
-#     else:
-#         return 1  # near the right point
+    elif right < left:
+        return abs(1 - right / left)
+    # else:
+    #     return 10 ** 32  # just return a large value
 
 
 # Normalize the input space
@@ -66,11 +58,10 @@ def balanceValue(left, right):
 
 # split the population recursively
 def RPTree(pop, depth, position):
-
     if depth == 0:
         position = "root"
 
-    if len(pop) < 5:
+    if len(pop) < 10 or depth >= 5:
         return None
 
     N_POLAR = int(math.log(math.sqrt(len(pop))) + 1)
@@ -132,16 +123,25 @@ def RPTree(pop, depth, position):
         eastItems = [balancedSamples[i] for i in range(len(balancedSamples)) if kmeans.labels_[i] == 0]
         westItems = [balancedSamples[i] for i in range(len(balancedSamples)) if kmeans.labels_[i] == 1]
 
-    print("Node size: ", len(balancedSamples))
     print(position)
-    print("depth: ", depth)
+    print("Node size: ", len(balancedSamples))
+    print("Current depth: ", depth)
     print("east items:", eastItems)
     print("west items:", westItems)
     print("\n")
 
+    OutputRPTree[position] = {}
+    OutputRPTree[position]['depth'] = depth
+    OutputRPTree[position]['eastitems'] = eastItems
+    OutputRPTree[position]['westitems'] = westItems
+
     depth = depth + 1
 
     return RPTree(eastItems, depth, position + "->left"), RPTree(westItems, depth, position + "->right")
+
+def bottomUp(RPTree):
+    print(RPTree)
+
 
 
 def main():
@@ -344,6 +344,16 @@ def main():
     #
     # print(label)
 
+
+# def projection(p=[], polar=[]):
+#     left = [polar[0], polar[1]]
+#     right = [polar[2], polar[3]]
+#
+#     # find point near left or right
+#     if sqd(p, left) <= sqd(p, right):
+#         return 0  # near the left point
+#     else:
+#         return 1  # near the right point
 
 if __name__ == "__main__":
     main()
