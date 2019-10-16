@@ -18,6 +18,7 @@ MIN_RANGE = 0
 BALANCE_THRESHOLD = 1.0
 OUTLIER_THRESHOLD = 0.05
 random.seed(12345)
+epsilon = 5
 
 OutputRPTree = {}
 
@@ -140,7 +141,16 @@ def RPTree(pop, depth, position):
     return RPTree(eastItems, depth, position + "->left"), RPTree(westItems, depth, position + "->right")
 
 def bottomUp(RPTree):
-    print(RPTree)
+    # print(RPTree)
+    depth = 4
+
+    for k,v in RPTree.items():
+        # print(k)
+        # print(v)
+        if v['depth'] ==  4:
+            print(k)
+            print(v)
+
 
 
 

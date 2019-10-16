@@ -1,7 +1,7 @@
 import test
 import numpy as np
 
-epsilon = 5
+
 
 # maximize fitness function
 def fitness(s):
@@ -36,6 +36,7 @@ def main():
     print(max(randomresult))
 
     print("Random Projection Tree:")
+    print("")
 
     test.RPTree(pop, 0, None)
     # print(test.OutputRPTree)
