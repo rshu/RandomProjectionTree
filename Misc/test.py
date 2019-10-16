@@ -9,13 +9,13 @@ import math
 from sklearn.cluster import KMeans
 
 # parameter initialization
-N_POPULATION = 500
+N_POPULATION = 50000
 N_DIMENSION = 3
 N_POLAR = int(math.log(math.sqrt(N_POPULATION)) + 1)
-N_SAMPLE = 256
+N_SAMPLE = 2560
 MAX_RANGE = 10000
 MIN_RANGE = 0
-BALANCE_THRESHOLD = 0.1
+BALANCE_THRESHOLD = 0.75
 OUTLIER_THRESHOLD = 0.05
 random.seed(12345)
 
@@ -60,12 +60,88 @@ def balanceValue(left, right):
 #     else:
 #         return 1  # near the right point
 
-# split the population recursively
-def RPTree():
-    pass
-
 
 # Normalize the input space
+
+
+# split the population recursively
+def RPTree(pop, depth, position):
+
+    if depth == 0:
+        position = "root"
+
+    if len(pop) < 5:
+        return None
+
+    N_POLAR = int(math.log(math.sqrt(len(pop))) + 1)
+    polar = {}
+
+    for i in range(N_POLAR ** N_POLAR + 5 ** 5):  # how to sample
+        randomP1 = random.choice(pop)
+        randomP2 = random.choice(pop)
+        polar[i] = {}
+        polar[i]['P1'] = randomP1
+        polar[i]['P2'] = randomP2
+        polar[i]['Distance'] = sqd(randomP1, randomP2)
+
+    sortedPolar = sorted(polar.items(), key=lambda x: x[1]['Distance'])
+    sortedPolar.reverse()
+
+    finalPolarList = [sortedPolar[i] for i in range(N_POLAR)]
+    finalPolar = dict(finalPolarList)
+
+    if depth == 0:
+        randomSample = select(pop.copy(), N_SAMPLE)
+    else:
+        randomSample = pop.copy()
+
+    projection = {}
+    for i in range(len(randomSample)):
+        projection[i] = {}
+        left = 0
+        right = 0
+
+        countPolar = 0
+        for key, value in finalPolar.items():
+            leftDistance = sqd(randomSample[i], value.get("P1"))
+            rightDiatance = sqd(randomSample[i], value.get("P2"))
+            currentPolar = "Polar" + str(countPolar)
+            if leftDistance <= rightDiatance:
+                left += 1
+                projection[i][currentPolar] = [0, 1]
+            else:
+                right += 1
+                projection[i][currentPolar] = [1, 0]
+            countPolar += 1
+            projection[i]["BalanceValue"] = balanceValue(left, right)
+
+    projectionCopy = {key: value for key, value in projection.copy().items() if
+                      value.get("BalanceValue") < BALANCE_THRESHOLD}
+
+    balancedSamples = []
+
+    for k, v in projectionCopy.items():
+        balancedSamples.append(randomSample[k])
+
+    if len(balancedSamples) < 3:
+        eastItems = balancedSamples.copy()
+        westItems = []
+    else:
+        balancedSampleArray = np.asarray(balancedSamples)
+        kmeans = KMeans(n_clusters=2, random_state=0).fit(balancedSampleArray)
+        eastItems = [balancedSamples[i] for i in range(len(balancedSamples)) if kmeans.labels_[i] == 0]
+        westItems = [balancedSamples[i] for i in range(len(balancedSamples)) if kmeans.labels_[i] == 1]
+
+    print("Node size: ", len(balancedSamples))
+    print(position)
+    print("depth: ", depth)
+    print("east items:", eastItems)
+    print("west items:", westItems)
+    print("\n")
+
+    depth = depth + 1
+
+    return RPTree(eastItems, depth, position + "->left"), RPTree(westItems, depth, position + "->right")
 
 
 def main():
@@ -182,12 +258,11 @@ def main():
 
     # use kmeans to group points into two clusters
     # one cluster into eastItems, the other cluster into westItems
-    eastItems = {}
-    westItems = {}
+    eastItems = []
+    westItems = []
 
     print(randomSample)
     balancedSamples = []
-
 
     for k, v in projectionCopy.items():
         # print(k)
@@ -201,13 +276,18 @@ def main():
     kmeans = KMeans(n_clusters=2, random_state=0).fit(balancedSampleArray)
     print(kmeans.labels_)
 
+    eastItems = [balancedSamples[i] for i in range(len(balancedSamples)) if kmeans.labels_[i] == 0]
+    westItems = [balancedSamples[i] for i in range(len(balancedSamples)) if kmeans.labels_[i] == 1]
+
+    print(eastItems)
+    print(len(eastItems))
+    print(westItems)
+    print(len(westItems))
+
     # east label = 0
     # west label = 1
 
     # do this recursively # TODO
-
-
-
 
     exit(1)
 
