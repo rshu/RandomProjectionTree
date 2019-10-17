@@ -4,6 +4,11 @@ class Node:
         self.left = None
         self.right = None
 
+    # return the object representation
+    def __repr__(self):
+        left = None if self.left is None else self.left.key
+        right = None if self.right is None else self.right.key
+        return '(Key: {}, Left: {}, Right: {})'.format(self.key, left, right)
 
 def maxLeafNode(root):
     if root is None:
@@ -12,13 +17,14 @@ def maxLeafNode(root):
     if root.left is not None or root.right is not None:
         maxLeafNode(root.left)
         maxLeafNode(root.right)
-        root.key = max(root.left.key, root.right.key)
+        root.key = max(root.left.key, root.right.key) # update this based on fitness function
 
     return root
 
 
 def main():
-    print("Build a tree first")
+
+    print("Build a tree first...")
     root = Node(2000)
     root.left = Node(1005)
     root.right = Node(923)
@@ -35,8 +41,12 @@ def main():
     root.right.right.left = Node(378)
     root.right.right.right = Node(223)
 
+    print(repr(root))
+
     maxLeafNode(root)
+    print("After pruning:")
     print(root.key)
+    print(repr(root.left.left.left))
 
 
 if __name__ == "__main__":
