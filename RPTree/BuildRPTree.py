@@ -10,6 +10,7 @@ N_POPULATION = 50000
 N_DIMENSION = 3
 MAX_RANGE = 10000
 MIN_RANGE = 0
+N_SAMPLE = 256
 BALANCE_THRESHOLD = 1.0
 
 random.seed(12345)
@@ -52,9 +53,12 @@ def generatePolar(pop):
     # generate N_POLAR**N_POLAR polars
     # however, we want to avoid short distance polars
     polar = {}
-    N_POLAR = int(math.log(math.sqrt(len(pop))) + 1)
+    if len(pop) > 0:
+        N_POLAR = int(math.log(math.sqrt(len(pop))) + 1)
+    else:
+        N_POLAR = 1
 
-    for i in range(N_POLAR ** N_POLAR):  # how to sample
+    for i in range(N_POLAR ** N_POLAR + 100):
         randomP1 = random.choice(pop)
         randomP2 = random.choice(pop)
         polar[i] = {}
@@ -77,8 +81,8 @@ def polarProjection(finalPolar, randomSample):
         projection[i] = {}
         left = 0
         right = 0
-
         countPolar = 0
+
         for key, value in finalPolar.items():
             leftDistance = sqd(randomSample[i], value.get("P1"))
             rightDiatance = sqd(randomSample[i], value.get("P2"))
@@ -92,6 +96,7 @@ def polarProjection(finalPolar, randomSample):
             countPolar += 1
             projection[i]["BalanceValue"] = balanceValue(left, right)
 
+    # only keep random sample whose balancevalue is less than threshold
     projectionCopy = {key: value for key, value in projection.copy().items() if
                       value.get("BalanceValue") < BALANCE_THRESHOLD}
 
@@ -100,6 +105,7 @@ def polarProjection(finalPolar, randomSample):
     for k, v in projectionCopy.items():
         balancedSamples.append(randomSample[k])
 
+    # split to eastitems and westitems
     if len(balancedSamples) < 3:
         eastItems = balancedSamples.copy()
         westItems = []
@@ -112,28 +118,47 @@ def polarProjection(finalPolar, randomSample):
     return eastItems, westItems
 
 
-def BuildTree(RandomSample):
-    if RandomSample is None:
+def BuildTree(population):
+    if population is None:
         return None
+    
+    polars = generatePolar(population)
+    eastitems, westitems = polarProjection(polars, population)
+    root = RPTree.TreeNode(population)
+    if eastitems is not None:
+        root.left = BuildTree(eastitems)
+    else:
+        root.left = None
 
-    root = RPTree.TreeNode(RandomSample)
-    root.left = BuildTree(polarProjection(RandomSample)[0])
-    root.right = BuildTree(polarProjection(RandomSample)[1])
+    if westitems is not None:
+        root.right = BuildTree(westitems)
+    else:
+        root.right = None
     return root
-
-
 
 
 def main():
     pop = [random_point() for _ in range(N_POPULATION)]
+    #
+    # # generate polars
+    # polars = generatePolar(pop)
+    # # print(polars)
+    #
+    # # select random samples from pop
+    # randomSample = select(pop.copy(), N_SAMPLE)
+    # # print(randomSample)
+    #
+    # # project selected random samples to polars
+    # eastitems, westitems = polarProjection(polars, randomSample)
+    # print("eastitems:")
+    # print(eastitems)
+    # print("westitems:")
+    # print(westitems)
 
     # Build Random Projection Tree
-    BuildTree(pop)
-
+    print(BuildTree(pop))
 
     # Prune Tree Nodes
-
-
 
 
 if __name__ == "__main__":
