@@ -2,7 +2,6 @@ import test
 import numpy as np
 
 
-
 # maximize fitness function
 def fitness(s):
     squresum = sum(map(lambda x: x ** 3, s))
@@ -41,7 +40,6 @@ def main():
     test.RPTree(pop, 0, None)
     # print(test.OutputRPTree)
     test.bottomUp(test.OutputRPTree)
-
 
 
 if __name__ == "__main__":
