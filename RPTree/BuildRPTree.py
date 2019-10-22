@@ -121,7 +121,7 @@ def polarProjection(finalPolar, randomSample):
 def BuildTree(population):
     if population is None:
         return None
-    
+
     polars = generatePolar(population)
     eastitems, westitems = polarProjection(polars, population)
     root = RPTree.TreeNode(population)
