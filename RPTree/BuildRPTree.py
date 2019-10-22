@@ -4,6 +4,8 @@ import numpy as np
 import math
 from sklearn.cluster import KMeans
 
+import RPTree
+
 N_POPULATION = 50000
 N_DIMENSION = 3
 MAX_RANGE = 10000
@@ -107,11 +109,26 @@ def polarProjection(finalPolar, randomSample):
         eastItems = [balancedSamples[i] for i in range(len(balancedSamples)) if kmeans.labels_[i] == 0]
         westItems = [balancedSamples[i] for i in range(len(balancedSamples)) if kmeans.labels_[i] == 1]
 
+    return eastItems, westItems
+
+
+def BuildTree(RandomSample):
+    if RandomSample is None:
+        return None
+
+    root = RPTree.TreeNode(RandomSample)
+    root.left = BuildTree(polarProjection(RandomSample)[0])
+    root.right = BuildTree(polarProjection(RandomSample)[1])
+    return root
+
+
+
 
 def main():
     pop = [random_point() for _ in range(N_POPULATION)]
 
     # Build Random Projection Tree
+    BuildTree(pop)
 
 
     # Prune Tree Nodes

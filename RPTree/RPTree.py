@@ -1,7 +1,7 @@
 import BuildRPTree as RP
 
 
-class Node:
+class TreeNode:
     def __init__(self, value=[]):
         self.key = value
         self.left = None
@@ -15,9 +15,9 @@ class Node:
 
 
 def main():
-    # root = Node([2000, 2001])
-    # root.left = Node([1005, 1006, 1007])
-    # root.right = Node([1008, 1009, 1010])
+    # root = TreeNode([2000, 2001])
+    # root.left = TreeNode([1005, 1006, 1007])
+    # root.right = TreeNode([1008, 1009, 1010])
     # print(repr(root))
 
     print("Building Random Projection Tree...")
