@@ -53,7 +53,7 @@ def main():
 
     print("Grid search:")
     # print(gridresult)
-    print(max(gridresult))
+    print("fitness score: ", max(gridresult))
     print("No. of Evaluation: ", BuildRPTree.N_POPULATION)
     print("")
 
@@ -65,7 +65,7 @@ def main():
 
     print("Random search:")
     # print(randomresult)
-    print(max(randomresult))
+    print("fitness score: ", max(randomresult))
     print("No. of Evaluation: ", 100)
     print("")
 
@@ -84,7 +84,7 @@ def main():
             RPResult = Evaluation.fitness(i)
 
     print("Random Projection:")
-    print(RPResult)
+    print("fitness score: ", RPResult)
     print("No. of Evaluation: ", numOfEvaluation + len(PruneTree(root).key))
 
 
