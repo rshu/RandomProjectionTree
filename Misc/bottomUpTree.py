@@ -51,3 +51,22 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# def PruneTree(root):
+#     if root is None:
+#         return
+#
+#     if root.left is not None and root.right is not None:
+#         l = random.choice(root.left.key)
+#         r = random.choice(root.right.key)
+#
+#         evaluationLeft = Evaluation.fitness(l)
+#         evaluationRight = Evaluation.fitness(r)
+#
+#         if evaluationLeft - evaluationRight >= BuildRPTree.EPSILON:
+#             root.key = root.left.key.copy()
+#         elif evaluationRight - evaluationLeft > BuildRPTree.EPSILON:
+#             root.key = root.right.copy()
+#
+#     return root

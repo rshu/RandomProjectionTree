@@ -6,12 +6,13 @@ from sklearn.cluster import KMeans
 
 import RPTree
 
-N_POPULATION = 1000
+N_POPULATION = 10000
 N_DIMENSION = 3
 MAX_RANGE = 10000
 MIN_RANGE = 0
 N_SAMPLE = 256
 BALANCE_THRESHOLD = 1.0
+EPSILON = 10.0
 
 random.seed(12345)
 
@@ -122,13 +123,12 @@ def BuildTree(population):
     if population is None:
         return None
 
-    print("Node length:", len(population))
-
+    # print("Node length:", len(population))
     polars = generatePolar(population)
     eastitems, westitems = polarProjection(polars, population)
-    print("east length:", len(eastitems))
-    print("west length:", len(westitems))
-    print("")
+    # print("east length:", len(eastitems))
+    # print("west length:", len(westitems))
+    # print("")
 
     root = RPTree.TreeNode(population)
     if len(eastitems):
@@ -145,6 +145,7 @@ def BuildTree(population):
 
 def main():
     pop = [random_point() for _ in range(N_POPULATION)]
+
     #
     # # generate polars
     # polars = generatePolar(pop)

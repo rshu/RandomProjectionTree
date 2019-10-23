@@ -7,3 +7,11 @@ def fitness(s):
     ssum = sum(map(lambda x: x, s))
     return np.sqrt(squresum) / ssum
 
+
+def main():
+    s = [2222, 3333, 4444]
+    print(fitness(s))
+
+
+if __name__ == "__main__":
+    main()
