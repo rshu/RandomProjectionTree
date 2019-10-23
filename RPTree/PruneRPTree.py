@@ -5,6 +5,8 @@ import Evaluation
 
 random.seed(5000)
 
+numOfEvaluation = 0
+
 def PruneTree(root):
     if root is None:
         return
@@ -29,6 +31,8 @@ def PruneTree(root):
 
         evaluationLeft = Evaluation.fitness(l)
         evaluationRight = Evaluation.fitness(r)
+        global numOfEvaluation
+        numOfEvaluation  += 2
 
         if evaluationLeft - evaluationRight >= BuildRPTree.EPSILON:
             root.key = root.left.key.copy()
@@ -50,6 +54,7 @@ def main():
     print("Grid search:")
     # print(gridresult)
     print(max(gridresult))
+    print("No. of Evaluation: ", BuildRPTree.N_POPULATION)
     print("")
 
     # random search
@@ -61,10 +66,12 @@ def main():
     print("Random search:")
     # print(randomresult)
     print(max(randomresult))
+    print("No. of Evaluation: ", 100)
     print("")
 
-
-    root = BuildRPTree.BuildTree(pop)
+    randomSample = BuildRPTree.select(pop.copy(), BuildRPTree.N_SAMPLE)
+    # print(len(randomSample))
+    root = BuildRPTree.BuildTree(randomSample)
     # print(len(root.key))
     # print(root)
     # print("")
@@ -78,8 +85,7 @@ def main():
 
     print("Random Projection:")
     print(RPResult)
-
-
+    print("No. of Evaluation: ", numOfEvaluation + len(PruneTree(root).key))
 
 
 if __name__ == "__main__":
