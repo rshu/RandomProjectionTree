@@ -3,6 +3,7 @@ import BuildRPTree
 import random
 import Evaluation
 
+random.seed(5000)
 
 def PruneTree(root):
     if root is None:
