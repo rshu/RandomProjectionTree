@@ -41,7 +41,7 @@ def select(data, size):
 
 
 def balanceValue(left, right):
-    if left <= right:
+    if left <= right: # TODO
         return abs(1 - left / right)
     elif right < left:
         return abs(1 - right / left)
