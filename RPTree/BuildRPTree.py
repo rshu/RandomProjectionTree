@@ -7,6 +7,10 @@ from hyperopt.pyll.stochastic import sample
 from scipy import spatial
 from scipy.spatial import distance
 
+import warnings
+
+warnings.filterwarnings("ignore")
+
 import RPTree
 import Evaluation
 
@@ -166,6 +170,7 @@ def BuildTree(population):
         root.right = None
     return root
 
+
 # normalize the data with MaxMinScale
 # y = (x - min)/(max - min)
 def maxminNormalize(x):
@@ -188,6 +193,21 @@ def maxminNormalize(x):
     normalzied_x["min_impurity_decrease"] = x_min_weight_fraction_leaf
 
     return normalzied_x
+
+
+def convertDictToList(normalized_x):
+    res = []
+
+    res.append(normalized_x["n_estimators"])
+    res.append(normalized_x["max_depth"])
+    res.append(normalized_x["min_samples_split"])
+    res.append(normalized_x["min_samples_leaf"])
+    res.append(normalized_x["max_leaf_nodes"])
+    res.append(normalized_x["min_impurity_decrease"])
+    res.append(normalized_x["min_impurity_decrease"])
+
+    return res
+
 
 def main():
     # pop = [random_point() for _ in range(N_POPULATION)]
@@ -232,9 +252,18 @@ def main():
     print(para_distance(normalized_x, normalized_y))
 
     space = [sample(Evaluation.para_space) for _ in range(50)]
-    print(space)
+    # print(space)
 
-    # Prune Tree Nodes
+    # make a copy of parameter space
+    spaceCopy = space.copy()
+    # print(spaceCopy)
+
+    for s in space:
+        print(s)
+        normalized_s = maxminNormalize(s)
+        print(normalized_s)
+        print(convertDictToList(normalized_s))
+        print("")
 
 
 if __name__ == "__main__":
