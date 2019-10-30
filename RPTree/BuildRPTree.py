@@ -3,8 +3,12 @@ from random import randrange
 import numpy as np
 import math
 from sklearn.cluster import KMeans
+from hyperopt.pyll.stochastic import sample
+from scipy import spatial
+from scipy.spatial import distance
 
 import RPTree
+import Evaluation
 
 N_POPULATION = 10000
 N_DIMENSION = 3
@@ -25,6 +29,26 @@ def sqd(p1, p2):
     return int(math.sqrt(sum((c1 - c2) ** 2 for c1, c2 in zip(p1, p2))))
 
 
+# compute cosine distance between two hyperparameters
+def para_distance(p1, p2):  # TODO
+
+    x = []
+    y = []
+    for key, value in sorted(p1.items(), key=lambda item: item[0]):
+        x.append(value)
+
+    for key, value in sorted(p2.items(), key=lambda item: item[0]):
+        y.append(value)
+
+    print("")
+    print(x)
+    print(y)
+    print("")
+    print("distance: ", float(distance.euclidean(x, y)))
+
+    return 1 - spatial.distance.cosine(x, y)
+
+
 def select(data, size):
     res = []
     for _ in range(size):
@@ -41,7 +65,7 @@ def select(data, size):
 
 
 def balanceValue(left, right):
-    if left <= right: # TODO
+    if left <= right:  # TODO
         return abs(1 - left / right)
     elif right < left:
         return abs(1 - right / left)
@@ -142,9 +166,31 @@ def BuildTree(population):
         root.right = None
     return root
 
+# normalize the data with MaxMinScale
+# y = (x - min)/(max - min)
+def maxminNormalize(x):
+    normalzied_x = {}
+
+    x_n_estimators = (x["n_estimators"] - 5) / (50 - 5)
+    x_max_depth = (x["max_depth"] - 2) / (100 - 2)
+    x_min_samples_split = (x["min_samples_split"] - 0.0) / (1.0 - 0.0)
+    x_min_samples_leaf = (x["min_samples_leaf"] - 0.0) / (0.5 - 0.0)
+    x_max_leaf_nodes = (x["max_leaf_nodes"] - 2) / (100 - 2)
+    x_min_impurity_decrease = (x["min_impurity_decrease"] - 0.0) / (1e-6 - 0.0)
+    x_min_weight_fraction_leaf = (x["min_weight_fraction_leaf"] - 0.0) / (0.5 - 0.0)
+
+    normalzied_x["n_estimators"] = x_n_estimators
+    normalzied_x["max_depth"] = x_max_depth
+    normalzied_x["min_samples_split"] = x_min_samples_split
+    normalzied_x["min_samples_leaf"] = x_min_samples_leaf
+    normalzied_x["max_leaf_nodes"] = x_max_leaf_nodes
+    normalzied_x["min_impurity_decrease"] = x_min_impurity_decrease
+    normalzied_x["min_impurity_decrease"] = x_min_weight_fraction_leaf
+
+    return normalzied_x
 
 def main():
-    pop = [random_point() for _ in range(N_POPULATION)]
+    # pop = [random_point() for _ in range(N_POPULATION)]
 
     #
     # # generate polars
@@ -165,9 +211,28 @@ def main():
     # Build Random Projection Tree
     # print(BuildTree(pop))
 
-    root = BuildTree(pop)
-    print(root.left)
-    print(root.right)
+    # root = BuildTree(pop)
+    # print(root.left)
+    # print(root.right)
+
+    x = sample(Evaluation.para_space)
+    print("x: ", x)
+    y = sample(Evaluation.para_space)
+    print("y: ", y)
+
+    normalized_x = maxminNormalize(x)
+    normalized_y = maxminNormalize(y)
+    print("normalized x: ", normalized_x)
+    print("normalized y: ", normalized_y)
+
+    print("Before max min scaler:")
+    print(para_distance(x, y))
+
+    print("After max min scaler: ")
+    print(para_distance(normalized_x, normalized_y))
+
+    space = [sample(Evaluation.para_space) for _ in range(50)]
+    print(space)
 
     # Prune Tree Nodes
 
