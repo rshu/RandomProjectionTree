@@ -72,19 +72,28 @@ def SMOTE(train_df):
 # # Subsampling (only applicable with 'goss')
 # subsample_dist = list(np.linspace(0.5, 1, 100))
 
+# para_space = {
+#     'n_estimators': hp.choice('n_estimators', range(50, 150)),
+#     'max_depth': hp.quniform('max_depth', 2, 100, 1),
+#     'min_samples_split': hp.uniform('min_samples_split', 0.0, 1.0),
+#     'min_samples_leaf': hp.uniform('min_samples_leaf', 0, 0.5),
+#     'max_leaf_nodes': hp.choice('max_leaf_nodes', range(2, 100)),
+#     'min_impurity_decrease': hp.uniform('min_impurity_decrease', 0.0, 1e-6),
+#     'min_weight_fraction_leaf': hp.uniform('min_weight_fraction_leaf', 0.0, 0.5)
+# }
 
 para_space = {
-    'n_estimators': hp.choice('n_estimators', range(5, 50)),
+    'n_estimators': hp.choice('n_estimators', range(50, 150)),
     'max_depth': hp.quniform('max_depth', 2, 100, 1),
-    'min_samples_split': hp.uniform('min_samples_split', 0.0, 1.0),
-    'min_samples_leaf': hp.uniform('min_samples_leaf', 0, 0.5),
-    'max_leaf_nodes': hp.choice('max_leaf_nodes', range(2, 100)),
+    'min_samples_split': hp.choice('min_samples_split', range(2, 10)),
+    'min_samples_leaf': hp.choice('min_samples_leaf', range(2, 10)),
+    'max_leaf_nodes': hp.choice('max_leaf_nodes', range(2, 50)),
     'min_impurity_decrease': hp.uniform('min_impurity_decrease', 0.0, 1e-6),
     'min_weight_fraction_leaf': hp.uniform('min_weight_fraction_leaf', 0.0, 0.5)
 }
 
 
-def readData(dataset):
+def read_data(dataset):
     train_df = pd.read_csv(f'../data/FARSEC/{dataset}-train.csv').drop(
         ['id'], axis=1)
     test_df = pd.read_csv(f'../data/FARSEC/{dataset}-test.csv').drop(
@@ -153,14 +162,14 @@ def RF(params):
     #                                min_samples_split=min_samples_split,
     #                                min_weight_fraction_leaf=min_weight_fraction_leaf)
     model = RandomForestClassifier(
-                                   n_estimators=n_estimators,
-                                   max_depth=max_depth,
-                                   max_leaf_nodes=max_leaf_nodes,
-                                   min_impurity_decrease=min_impurity_decrease,
-                                   min_samples_leaf=min_samples_leaf,
-                                   min_samples_split=min_samples_split,
-                                   min_weight_fraction_leaf=min_weight_fraction_leaf
-                                    )
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        max_leaf_nodes=max_leaf_nodes,
+        min_impurity_decrease=min_impurity_decrease,
+        min_samples_leaf=min_samples_leaf,
+        min_samples_split=min_samples_split,
+        min_weight_fraction_leaf=min_weight_fraction_leaf
+    )
     return model
 
 
@@ -169,15 +178,31 @@ def main():
     # params['subsample'] = random.sample(subsample_dist, 1)[0] if params['boosting_type'] != 'goss' else 1.0
     print(params)
 
-    train_df, test_df = readData("ambari-clni")
+    train_df, test_df = read_data("ambari-clni")
     train_df = SMOTE(train_df)
     X = train_df.loc[:, train_df.columns != 'label']
     y = train_df.label
     X_test = test_df.loc[:, test_df.columns != 'label']
     test_labels = test_df.label.values.tolist()
 
-    # model = RF(params)
-    model = RandomForestClassifier(random_state=15325)
+    model = RF(params)
+    # model = RandomForestClassifier(random_state=15325)
+    # model = RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+    #                    max_depth=95.0, max_features='auto', max_leaf_nodes=5,
+    #                    min_impurity_decrease=1.4453418778034065e-07,
+    #                    min_impurity_split=None, min_samples_leaf=6,
+    #                    min_samples_split=8,
+    #                    min_weight_fraction_leaf=0.06271981064352494,
+    #                    n_estimators=77, n_jobs=None, oob_score=False,
+    #                    random_state=None, verbose=0, warm_start=False)
+    # model = RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+    #                    max_depth=2.0, max_features='auto', max_leaf_nodes=27,
+    #                    min_impurity_decrease=6.255259369350126e-07,
+    #                    min_impurity_split=None, min_samples_leaf=8,
+    #                    min_samples_split=2,
+    #                    min_weight_fraction_leaf=0.007253257758598586,
+    #                    n_estimators=80, n_jobs=None, oob_score=False,
+    #                    random_state=None, verbose=0, warm_start=False)
     print(model)
     model.fit(X, y)
     prediction = model.predict(X_test)

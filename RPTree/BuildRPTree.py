@@ -8,7 +8,6 @@ from scipy import spatial
 from scipy.spatial import distance
 
 import warnings
-
 warnings.filterwarnings("ignore")
 
 import RPTree
@@ -18,7 +17,7 @@ N_POPULATION = 10000
 N_DIMENSION = 3
 MAX_RANGE = 10000
 MIN_RANGE = 0
-N_SAMPLE = 900
+N_SAMPLE = 1000
 BALANCE_THRESHOLD = 1.0
 EPSILON = 10.0
 
@@ -258,13 +257,12 @@ def main():
     spaceCopy = space.copy()
     # print(spaceCopy)
 
-    for s in space:
+    for s in spaceCopy:
         print(s)
         normalized_s = maxminNormalize(s)
         print(normalized_s)
         print(convertDictToList(normalized_s))
         print("")
 
-
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

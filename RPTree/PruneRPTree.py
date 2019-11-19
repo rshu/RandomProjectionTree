@@ -7,6 +7,7 @@ random.seed(5000)
 
 numOfEvaluation = 0
 
+
 def PruneTree(root):
     if root is None:
         return
@@ -32,7 +33,7 @@ def PruneTree(root):
         evaluationLeft = Evaluation.fitness(l)
         evaluationRight = Evaluation.fitness(r)
         global numOfEvaluation
-        numOfEvaluation  += 2
+        numOfEvaluation += 2
 
         if evaluationLeft - evaluationRight >= BuildRPTree.EPSILON:
             root.key = root.left.key.copy()
@@ -87,6 +88,6 @@ def main():
     print("fitness score: ", RPResult)
     print("No. of Evaluation: ", numOfEvaluation + len(PruneTree(root).key))
 
-
-if __name__ == "__main__":
-    main()
+#
+# if __name__ == "__main__":
+#     main()

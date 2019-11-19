@@ -14,14 +14,13 @@ class TreeNode:
         return '(Current Node: {}, Left: {}, Right: {})'.format(self.key, left, right)
 
 
-def main():
-    # root = TreeNode([2000, 2001])
-    # root.left = TreeNode([1005, 1006, 1007])
-    # root.right = TreeNode([1008, 1009, 1010])
-    # print(repr(root))
+# def main():
+#     # root = TreeNode([2000, 2001])
+#     # root.left = TreeNode([1005, 1006, 1007])
+#     # root.right = TreeNode([1008, 1009, 1010])
+#     # print(repr(root))
+#
+#     print("Building Random Projection Tree...")
 
-    print("Building Random Projection Tree...")
-
-
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
