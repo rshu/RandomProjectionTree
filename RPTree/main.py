@@ -75,6 +75,9 @@ def main():
     print("Random Projection:")
     print("fitness score: ", RPResult) # TODO
 
+# need to address both numeric and categorical hyperparameters
+# before Dec 10th
+# check GAN for security
 
 if __name__ == "__main__":
     main()
