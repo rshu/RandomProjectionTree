@@ -43,11 +43,11 @@ def para_distance(p1, p2):  # TODO
     for key, value in sorted(p2.items(), key=lambda item: item[0]):
         y.append(value)
 
-    print("")
-    print(x)
-    print(y)
-    print("")
-    print("distance: ", float(distance.euclidean(x, y)))
+    # print("")
+    # print(x)
+    # print(y)
+    # print("")
+    # print("distance: ", float(distance.euclidean(x, y)))
 
     return 1 - spatial.distance.cosine(x, y)
 
@@ -92,7 +92,9 @@ def generatePolar(pop):
         polar[i] = {}
         polar[i]['P1'] = randomP1
         polar[i]['P2'] = randomP2
-        polar[i]['Distance'] = sqd(randomP1, randomP2)
+        # polar[i]['Distance'] = sqd(randomP1, randomP2)
+        polar[i]['Distance'] = para_distance(randomP1, randomP2)  # incorrect distance calculation, need normalized first
+        # should be para_distance(normalized_x, normalized_y)
 
     sortedPolar = sorted(polar.items(), key=lambda x: x[1]['Distance'])
     sortedPolar.reverse()
@@ -112,8 +114,10 @@ def polarProjection(finalPolar, randomSample):
         countPolar = 0
 
         for key, value in finalPolar.items():
-            leftDistance = sqd(randomSample[i], value.get("P1"))
-            rightDiatance = sqd(randomSample[i], value.get("P2"))
+            # leftDistance = sqd(randomSample[i], value.get("P1"))
+            # rightDiatance = sqd(randomSample[i], value.get("P2"))
+            leftDistance = para_distance(randomSample[i], value.get("P1")) # incorrect distance calculation
+            rightDiatance = para_distance(randomSample[i], value.get("P2")) # incorrect distance calculation
             currentPolar = "Polar" + str(countPolar)
             if leftDistance <= rightDiatance:
                 left += 1
@@ -152,9 +156,11 @@ def BuildTree(population):
 
     # print("Node length:", len(population))
     polars = generatePolar(population)
+    print("polars: \n", polars)
+
     eastitems, westitems = polarProjection(polars, population)
-    # print("east length:", len(eastitems))
-    # print("west length:", len(westitems))
+    print("east length:", len(eastitems))
+    print("west length:", len(westitems))
     # print("")
 
     root = RPTree.TreeNode(population)
@@ -245,69 +251,69 @@ def reverse_minmaxScaler(x):
     return reverse_normalzied_x
 
 
-def main():
-    # pop = [random_point() for _ in range(N_POPULATION)]
+# def main():
+#     # pop = [random_point() for _ in range(N_POPULATION)]
+#
+#     #
+#     # # generate polars
+#     # polars = generatePolar(pop)
+#     # # print(polars)
+#     #
+#     # # select random samples from pop
+#     # randomSample = select(pop.copy(), N_SAMPLE)
+#     # # print(randomSample)
+#     #
+#     # # project selected random samples to polars
+#     # eastitems, westitems = polarProjection(polars, randomSample)
+#     # print("eastitems:")
+#     # print(eastitems)
+#     # print("westitems:")
+#     # print(westitems)
+#
+#     # Build Random Projection Tree
+#     # print(BuildTree(pop))
+#
+#     # root = BuildTree(pop)
+#     # print(root.left)
+#     # print(root.right)
+#
+#     x = sample(Evaluation.para_space)
+#     print("x: ", x)
+#     y = sample(Evaluation.para_space)
+#     print("y: ", y)
+#
+#     normalized_x = maxminNormalize(x)
+#     normalized_y = maxminNormalize(y)
+#     print("normalized x: ", normalized_x)
+#     print("normalized y: ", normalized_y)
+#
+#     print("")
+#     print("Before max min scaler:")
+#     print(para_distance(x, y))
+#
+#     print("")
+#     print("After max min scaler: ")
+#     print(para_distance(normalized_x, normalized_y))
+#
+#     space = [sample(Evaluation.para_space) for _ in range(50)]
+#     # print(space)
+#
+#     # make a copy of parameter space
+#     spaceCopy = space.copy()
+#     # print(spaceCopy)
+#
+#     for s in spaceCopy:
+#         print(s)
+#         normalized_s = maxminNormalize(s)
+#         print(normalized_s)
+#         list = convertDictToList(normalized_s)
+#         print(list)
+#         dict = convertListToDict(list)
+#         print(dict)
+#         r_dict = reverse_minmaxScaler(dict)
+#         print(r_dict)
+#         print("")
 
-    #
-    # # generate polars
-    # polars = generatePolar(pop)
-    # # print(polars)
-    #
-    # # select random samples from pop
-    # randomSample = select(pop.copy(), N_SAMPLE)
-    # # print(randomSample)
-    #
-    # # project selected random samples to polars
-    # eastitems, westitems = polarProjection(polars, randomSample)
-    # print("eastitems:")
-    # print(eastitems)
-    # print("westitems:")
-    # print(westitems)
 
-    # Build Random Projection Tree
-    # print(BuildTree(pop))
-
-    # root = BuildTree(pop)
-    # print(root.left)
-    # print(root.right)
-
-    x = sample(Evaluation.para_space)
-    print("x: ", x)
-    y = sample(Evaluation.para_space)
-    print("y: ", y)
-
-    normalized_x = maxminNormalize(x)
-    normalized_y = maxminNormalize(y)
-    print("normalized x: ", normalized_x)
-    print("normalized y: ", normalized_y)
-
-    print("")
-    print("Before max min scaler:")
-    print(para_distance(x, y))
-
-    print("")
-    print("After max min scaler: ")
-    print(para_distance(normalized_x, normalized_y))
-
-    space = [sample(Evaluation.para_space) for _ in range(50)]
-    # print(space)
-
-    # make a copy of parameter space
-    spaceCopy = space.copy()
-    # print(spaceCopy)
-
-    for s in spaceCopy:
-        print(s)
-        normalized_s = maxminNormalize(s)
-        print(normalized_s)
-        list = convertDictToList(normalized_s)
-        print(list)
-        dict = convertListToDict(list)
-        print(dict)
-        r_dict = reverse_minmaxScaler(dict)
-        print(r_dict)
-        print("")
-
-
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

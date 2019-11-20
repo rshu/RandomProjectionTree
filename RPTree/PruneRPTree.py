@@ -30,17 +30,55 @@ def PruneTree(root):
         l = random.choice(root.left.key)
         r = random.choice(root.right.key)
 
-        evaluationLeft = Evaluation.fitness(l)
-        evaluationRight = Evaluation.fitness(r)
+        evaluationLeft = Evaluation.fitness_RF(l)
+        evaluationRight = Evaluation.fitness_RF(r)
         global numOfEvaluation
         numOfEvaluation += 2
 
-        if evaluationLeft - evaluationRight >= BuildRPTree.EPSILON:
+        # if evaluationLeft - evaluationRight >= BuildRPTree.EPSILON:
+        #     root.key = root.left.key.copy()
+        # elif evaluationRight - evaluationLeft > BuildRPTree.EPSILON:
+        #     root.key = root.right.key.copy()
+
+        if evaluationLeft - evaluationRight >= 0.05:
             root.key = root.left.key.copy()
-        elif evaluationRight - evaluationLeft > BuildRPTree.EPSILON:
+        elif evaluationRight - evaluationLeft > 0.05:
             root.key = root.right.key.copy()
         return root
 
+
+# def PruneTree(root):
+#     if root is None:
+#         return
+#
+#     # print(root)
+#     # print(len(root.key))
+#
+#     PruneTree(root.left)
+#     PruneTree(root.right)
+#
+#     if root.left is None and root.right is None:
+#         return root
+#     elif root.right is None and root.left is not None:
+#         root.key = root.left.key.copy()
+#         return root
+#     elif root.left is None and root.right is not None:
+#         root.key = root.right.key.copy()
+#         return root
+#     elif root.left is not None and root.right is not None:
+#         l = random.choice(root.left.key)
+#         r = random.choice(root.right.key)
+#
+#         evaluationLeft = Evaluation.fitness(l)
+#         evaluationRight = Evaluation.fitness(r)
+#         global numOfEvaluation
+#         numOfEvaluation += 2
+#
+#         if evaluationLeft - evaluationRight >= BuildRPTree.EPSILON:
+#             root.key = root.left.key.copy()
+#         elif evaluationRight - evaluationLeft > BuildRPTree.EPSILON:
+#             root.key = root.right.key.copy()
+#         return root
 
 def main():
     pop = [BuildRPTree.random_point() for _ in range(BuildRPTree.N_POPULATION)]
@@ -88,6 +126,6 @@ def main():
     print("fitness score: ", RPResult)
     print("No. of Evaluation: ", numOfEvaluation + len(PruneTree(root).key))
 
-#
-# if __name__ == "__main__":
-#     main()
+
+if __name__ == "__main__":
+    main()

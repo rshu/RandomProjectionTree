@@ -129,6 +129,8 @@ def get_prediction(test_labels, prediction):
     print("F-measure: ", f1)
     print("G-measure: ", gm)
 
+    return rec, fpr, pre, f1, gm
+
 
 # def LGB(params):
 #     class_weight = params["class_weight"]
@@ -171,6 +173,23 @@ def RF(params):
         min_weight_fraction_leaf=min_weight_fraction_leaf
     )
     return model
+
+
+def fitness_RF(params):
+
+    train_df, test_df = read_data("ambari-clni")
+    train_df = SMOTE(train_df)
+    X = train_df.loc[:, train_df.columns != 'label']
+    y = train_df.label
+    X_test = test_df.loc[:, test_df.columns != 'label']
+    test_labels = test_df.label.values.tolist()
+
+    model = RF(params)
+    model.fit(X, y)
+    prediction = model.predict(X_test)
+    rec, fpr, pre, f1, gm = get_prediction(test_labels, prediction)
+
+    return gm
 
 
 def main():
