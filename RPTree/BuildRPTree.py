@@ -84,7 +84,7 @@ def generatePolar(pop):
     if len(pop) > 0:
         N_POLAR = int(math.log(math.sqrt(len(pop))) + 1)
     else:
-        N_POLAR = 1
+        N_POLAR = 1 # default number of polar
 
     for i in range(N_POLAR ** N_POLAR + 100):
         randomP1 = random.choice(pop)
@@ -175,11 +175,11 @@ def BuildTree(population):
 def maxminNormalize(x):
     normalzied_x = {}
 
-    x_n_estimators = (x["n_estimators"] - 5) / (50 - 5)
+    x_n_estimators = (x["n_estimators"] - 50) / (150 - 50)
     x_max_depth = (x["max_depth"] - 2) / (100 - 2)
-    x_min_samples_split = (x["min_samples_split"] - 0.0) / (1.0 - 0.0)
-    x_min_samples_leaf = (x["min_samples_leaf"] - 0.0) / (0.5 - 0.0)
-    x_max_leaf_nodes = (x["max_leaf_nodes"] - 2) / (100 - 2)
+    x_min_samples_split = (x["min_samples_split"] - 2) / (10 - 2)
+    x_min_samples_leaf = (x["min_samples_leaf"] - 2) / (10 - 2)
+    x_max_leaf_nodes = (x["max_leaf_nodes"] - 2) / (50 - 2)
     x_min_impurity_decrease = (x["min_impurity_decrease"] - 0.0) / (1e-6 - 0.0)
     x_min_weight_fraction_leaf = (x["min_weight_fraction_leaf"] - 0.0) / (0.5 - 0.0)
 
@@ -189,7 +189,7 @@ def maxminNormalize(x):
     normalzied_x["min_samples_leaf"] = x_min_samples_leaf
     normalzied_x["max_leaf_nodes"] = x_max_leaf_nodes
     normalzied_x["min_impurity_decrease"] = x_min_impurity_decrease
-    normalzied_x["min_impurity_decrease"] = x_min_weight_fraction_leaf
+    normalzied_x["min_weight_fraction_leaf"] = x_min_weight_fraction_leaf
 
     return normalzied_x
 
@@ -203,9 +203,46 @@ def convertDictToList(normalized_x):
     res.append(normalized_x["min_samples_leaf"])
     res.append(normalized_x["max_leaf_nodes"])
     res.append(normalized_x["min_impurity_decrease"])
-    res.append(normalized_x["min_impurity_decrease"])
+    res.append(normalized_x["min_weight_fraction_leaf"])
 
     return res
+
+
+def convertListToDict(res):
+    # TODO
+    dict = {}
+
+    dict["n_estimators"] = res[0]
+    dict["max_depth"] = res[1]
+    dict["min_samples_split"] = res[2]
+    dict["min_samples_leaf"] = res[3]
+    dict["max_leaf_nodes"] = res[4]
+    dict["min_impurity_decrease"] = res[5]
+    dict["min_weight_fraction_leaf"] = res[6]
+
+    return dict
+
+def reverse_minmaxScaler(x):
+
+    reverse_normalzied_x = {}
+
+    x_n_estimators = x["n_estimators"] * (150 - 50) + 50
+    x_max_depth = x["max_depth"] * (100 - 2) + 2
+    x_min_samples_split = x["min_samples_split"] * (10 - 2) + 2
+    x_min_samples_leaf = x["min_samples_leaf"] * (10 - 2) + 2
+    x_max_leaf_nodes = x["max_leaf_nodes"] * (50 - 2) + 2
+    x_min_impurity_decrease = x["min_impurity_decrease"] * (1e-6 - 0.0) + 0.0
+    x_min_weight_fraction_leaf = x["min_weight_fraction_leaf"] * (0.5 - 0.0) + 0.0
+
+    reverse_normalzied_x["n_estimators"] = int(x_n_estimators)
+    reverse_normalzied_x["max_depth"] = int(x_max_depth)
+    reverse_normalzied_x["min_samples_split"] = int(x_min_samples_split)
+    reverse_normalzied_x["min_samples_leaf"] = int(x_min_samples_leaf)
+    reverse_normalzied_x["max_leaf_nodes"] = int(x_max_leaf_nodes)
+    reverse_normalzied_x["min_impurity_decrease"] = x_min_impurity_decrease
+    reverse_normalzied_x["min_weight_fraction_leaf"] = x_min_weight_fraction_leaf
+
+    return reverse_normalzied_x
 
 
 def main():
@@ -244,9 +281,11 @@ def main():
     print("normalized x: ", normalized_x)
     print("normalized y: ", normalized_y)
 
+    print("")
     print("Before max min scaler:")
     print(para_distance(x, y))
 
+    print("")
     print("After max min scaler: ")
     print(para_distance(normalized_x, normalized_y))
 
@@ -261,8 +300,14 @@ def main():
         print(s)
         normalized_s = maxminNormalize(s)
         print(normalized_s)
-        print(convertDictToList(normalized_s))
+        list = convertDictToList(normalized_s)
+        print(list)
+        dict = convertListToDict(list)
+        print(dict)
+        r_dict = reverse_minmaxScaler(dict)
+        print(r_dict)
         print("")
 
-# if __name__ == "__main__":
-#     main()
+
+if __name__ == "__main__":
+    main()
